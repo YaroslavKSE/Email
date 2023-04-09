@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', function () {
     //Function to send an email
     document.querySelector('#compose-form').onsubmit = send_mail;
 
-        // By default, load the inbox
-        load_mailbox('inbox');
+    // By default, load the inbox
+    load_mailbox('inbox');
 });
 
 function compose_email() {
@@ -30,6 +30,8 @@ function load_mailbox(mailbox) {
     // Show the mailbox and hide other views
     document.querySelector('#emails-view').style.display = 'block';
     document.querySelector('#compose-view').style.display = 'none';
+    document.querySelector('#view-email').style.display = 'none';
+
 
     // Show the mailbox name
     document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -76,8 +78,23 @@ function load_email_view(mail) {
         .then(email => {
             // Print email
             console.log(email);
-
             // ... do something else with email ...
+
+            fetch(`/emails/${mailId}`, {
+                method: 'PUT',
+                body: JSON.stringify({
+                    read: true
+                })
+            });
+
+            document.querySelector('#emails-view').style.display = 'none';
+            document.querySelector('#view-email').style.display = 'block';
+
+            document.querySelector('#email-subject').innerHTML = mail.subject;
+            document.querySelector('#email-sender').innerHTML = mail.sender;
+            document.querySelector("#email-timestamp").innerHTML = mail.timestamp;
+            document.querySelector('#email-massege').innerHTML = mail.body;
+
         });
 }
 
@@ -109,7 +126,7 @@ function show_email(mail) {
     emailDiv.appendChild(bodyDiv);
 
     //Check if email is read
-    if (mail.read) {
+    if (mail.read === true) {
         emailDiv.className = "card text-dark bg-light mb-3"
     } else {
         emailDiv.className = "card border-primary mb-3"
@@ -119,14 +136,13 @@ function show_email(mail) {
 
     // Add a click event listener to the email div to load the email view
 
+
     emailDiv.style.cursor = 'pointer';
     emailDiv.addEventListener('click', function () {
         load_email_view(mail);
     });
 
-
     // Add the email div to the document
     const containerDiv = document.querySelector('#emails-view');
     containerDiv.appendChild(emailDiv);
-
 }

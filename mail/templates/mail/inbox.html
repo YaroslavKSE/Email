@@ -14,12 +14,30 @@
     <div id="emails-view">
     </div>
 
+    <div id="view-email">
+        <div class="card mb-3" id="email-card">
+            <div class="card-header">
+                <h5 id="email-sender" class="card-title mb-0"></h5>
+                <small id="email-timestamp" class="text-muted"></small>
+            </div>
+            <div class="card-body">
+                <h6 id="email-subject" class="card-subtitle mb-2 fst-italic"></h6>
+            </div>
+            <div class="card-header">
+                <p id="email-massege" class="fst-normal"></p>
+            </div>
+        </div>
+    <div class="d-flex justify-content-end">
+                <button id="reply" class="btn btn-primary btn-sm mx-1" > Reply </button>
+                <button id="archive" class="btn btn-secondary btn-sm mx-1"> Archive </button>
+            </div>
+    </div>
 
     <div id="compose-view">
         <h3>New Email</h3>
         <form id="compose-form">
             <div class="form-group">
-                From: <input disabled class="form-control"  value="{{ request.user.email }}">
+                From: <input disabled class="form-control" value="{{ request.user.email }}">
             </div>
             <div class="form-group">
                 To: <input id="compose-recipients" placeholder="Recipient" class="form-control">
