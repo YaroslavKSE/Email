@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', function () {
     //Function to send an email
     document.querySelector('#compose-form').onsubmit = send_mail;
 
-    // By default, load the inbox
-    load_mailbox('inbox');
+        // By default, load the inbox
+        load_mailbox('inbox');
 });
 
 function compose_email() {
@@ -69,10 +69,22 @@ function send_mail() {
     return false; // to avoid reloading inbox page
 }
 
+function load_email_view(mail) {
+    const mailId = mail.id;
+    fetch(`/emails/${mailId}`)
+        .then(response => response.json())
+        .then(email => {
+            // Print email
+            console.log(email);
+
+            // ... do something else with email ...
+        });
+}
+
 function show_email(mail) {
-    const emailDiv = document.createElement('div')
+    const emailDiv = document.createElement('div');
     emailDiv.classList.add("card", "mb-3");
-    emailDiv.id = "email-card"
+    emailDiv.id = "email-card";
 
     // Create a card header with the email sender and date
     const headerDiv = document.createElement("div");
@@ -96,14 +108,8 @@ function show_email(mail) {
     bodyDiv.appendChild(topicElement);
     emailDiv.appendChild(bodyDiv);
 
-    // Create an archive button
-    const archiveButton = document.createElement("button");
-    archiveButton.classList.add("btn", "btn-secondary");
-    archiveButton.textContent = "Archive";
-    emailDiv.appendChild(archiveButton);
-
     //Check if email is read
-    if (mail.read){
+    if (mail.read) {
         emailDiv.className = "card text-dark bg-light mb-3"
     } else {
         emailDiv.className = "card border-primary mb-3"
@@ -111,9 +117,16 @@ function show_email(mail) {
     //card text-dark bg-light mb-3
     //card border-dark mb-3
 
+    // Add a click event listener to the email div to load the email view
+
+    emailDiv.style.cursor = 'pointer';
+    emailDiv.addEventListener('click', function () {
+        load_email_view(mail);
+    });
+
 
     // Add the email div to the document
     const containerDiv = document.querySelector('#emails-view');
     containerDiv.appendChild(emailDiv);
-    return false
+
 }
