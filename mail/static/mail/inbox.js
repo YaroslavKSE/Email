@@ -5,10 +5,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
     document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
     document.querySelector('#compose').addEventListener('click', compose_email);
-
+    document.querySelector('#archive').addEventListener('click', archive_email);
     //Function to send an email
     document.querySelector('#compose-form').onsubmit = send_mail;
-
     // By default, load the inbox
     load_mailbox('inbox');
 });
@@ -85,7 +84,7 @@ function load_email_view(mail) {
                 body: JSON.stringify({
                     read: true
                 })
-            });
+            })
 
             document.querySelector('#emails-view').style.display = 'none';
             document.querySelector('#view-email').style.display = 'block';
@@ -94,8 +93,19 @@ function load_email_view(mail) {
             document.querySelector('#email-sender').innerHTML = mail.sender;
             document.querySelector("#email-timestamp").innerHTML = mail.timestamp;
             document.querySelector('#email-massege').innerHTML = mail.body;
-
         });
+}
+
+function archive_email(mail) {
+    const mailId = mail.id;
+    fetch(`/emails/${mailId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            archived: true
+        })
+    }).then(r => console.log(r.toString()))
+    localStorage.clear() // to load sent mailbox with all the information
+    load_mailbox('inbox')
 }
 
 function show_email(mail) {
