@@ -5,9 +5,9 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
     document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
     document.querySelector('#compose').addEventListener('click', compose_email);
-    document.querySelector('#archive').addEventListener('click', archive_email);
     //Function to send an email
     document.querySelector('#compose-form').onsubmit = send_mail;
+    document.querySelector('#reply-form').onsubmit = reply_mail;
     // By default, load the inbox
     load_mailbox('inbox');
 });
@@ -17,6 +17,7 @@ function compose_email() {
     // Show compose view and hide other views
     document.querySelector('#emails-view').style.display = 'none';
     document.querySelector('#compose-view').style.display = 'block';
+    document.querySelector('#reply-view').style.display = 'none';
 
     // Clear out composition fields
     document.querySelector('#compose-recipients').value = '';
@@ -30,7 +31,7 @@ function load_mailbox(mailbox) {
     document.querySelector('#emails-view').style.display = 'block';
     document.querySelector('#compose-view').style.display = 'none';
     document.querySelector('#view-email').style.display = 'none';
-
+    document.querySelector('#reply-view').style.display = 'none';
 
     // Show the mailbox name
     document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -44,7 +45,7 @@ function load_mailbox(mailbox) {
             console.log(email);
 
             // ... do something else with email ...
-        });
+        })
 }
 
 function send_mail() {
@@ -65,35 +66,60 @@ function send_mail() {
             // Print result
             console.log(result);
         });
-    localStorage.clear() // to load sent mailbox with all the information
     load_mailbox('sent')
-    return false; // to avoid reloading inbox page
+    window.location.reload();
+}
+
+function reply_mail() {
+    const recipients = document.querySelector('#reply-recipients').value;
+    const subject = document.querySelector('#reply-subject').value;
+    const body = document.querySelector('#reply-body').value;
+
+    fetch('/emails', {
+        method: 'POST',
+        body: JSON.stringify({
+            recipients: recipients,
+            subject: subject,
+            body: body
+        })
+    })
+        .then(response => response.json())
+        .then(result => {
+            // Print result
+            console.log(result);
+        });
+    load_mailbox('sent')
+    window.location.reload();
 }
 
 function load_email_view(mail) {
     const mailId = mail.id;
-    fetch(`/emails/${mailId}`)
-        .then(response => response.json())
-        .then(email => {
-            // Print email
-            console.log(email);
-            // ... do something else with email ...
 
-            fetch(`/emails/${mailId}`, {
-                method: 'PUT',
-                body: JSON.stringify({
-                    read: true
-                })
-            })
+    fetch(`/emails/${mailId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            read: true
+        })
+    }).then()
 
-            document.querySelector('#emails-view').style.display = 'none';
-            document.querySelector('#view-email').style.display = 'block';
+    document.querySelector('#emails-view').style.display = 'none';
+    document.querySelector('#view-email').style.display = 'block';
 
-            document.querySelector('#email-subject').innerHTML = mail.subject;
-            document.querySelector('#email-sender').innerHTML = mail.sender;
-            document.querySelector("#email-timestamp").innerHTML = mail.timestamp;
-            document.querySelector('#email-massege').innerHTML = mail.body;
-        });
+    document.querySelector('#email-subject').innerHTML = mail.subject;
+    document.querySelector('#email-sender').innerHTML = mail.sender;
+    document.querySelector("#email-timestamp").innerHTML = mail.timestamp;
+    document.querySelector('#email-massage').innerHTML = mail.body;
+
+
+    if (mail.archived === true) {
+        document.querySelector('#archive').innerHTML = "UnArchive"
+        document.querySelector('#archive').addEventListener('click', () => unarchive_email(mail));
+
+
+    } else {
+        document.querySelector('#archive').addEventListener('click', () => archive_email(mail));
+    }
+    document.querySelector('#reply').addEventListener('click', () => reply_view(mail));
 }
 
 function archive_email(mail) {
@@ -103,9 +129,31 @@ function archive_email(mail) {
         body: JSON.stringify({
             archived: true
         })
-    }).then(r => console.log(r.toString()))
-    localStorage.clear() // to load sent mailbox with all the information
+    }).then()
     load_mailbox('inbox')
+    window.location.reload();
+
+}
+
+function unarchive_email(mail) {
+    const mailId = mail.id;
+    fetch(`/emails/${mailId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+            archived: false
+        })
+    }).then()
+    load_mailbox('inbox')
+    window.location.reload();
+}
+
+function reply_view(mail) {
+    document.querySelector('#view-email').style.display = 'none';
+    document.querySelector('#reply-view').style.display = 'block';
+    document.querySelector('#reply-recipients').value = mail.sender;
+    document.querySelector('#reply-subject').value = `RE: ${mail.subject}`;
+    document.querySelector("#reply-body").innerHTML = `On ${mail.timestamp} wrote: ${mail.body}`;
+
 }
 
 function show_email(mail) {

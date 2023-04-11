@@ -24,13 +24,13 @@
                 <h6 id="email-subject" class="card-subtitle mb-2 fst-italic"></h6>
             </div>
             <div class="card-header">
-                <p id="email-massege" class="fst-normal"></p>
+                <p id="email-massage" class="fst-normal"></p>
             </div>
         </div>
-    <div class="d-flex justify-content-end">
-                <button id="reply" class="btn btn-primary btn-sm mx-1" > Reply </button>
-                <button id="archive" class="btn btn-secondary btn-sm mx-1"> Archive </button>
-            </div>
+        <div class="d-flex justify-content-end">
+            <button id="reply" class="btn btn-primary btn-sm mx-1"> Reply</button>
+            <button id="archive" class="btn btn-secondary btn-sm mx-1"> Archive</button>
+        </div>
     </div>
 
     <div id="compose-view">
@@ -46,6 +46,23 @@
                 <input class="form-control" id="compose-subject" placeholder="Subject">
             </div>
             <textarea class="form-control" id="compose-body" placeholder="Body"></textarea>
+            <input type="submit" class="btn btn-primary"/>
+        </form>
+    </div>
+
+    <div id="reply-view">
+        <h3>New Email</h3>
+        <form id="reply-form">
+            <div class="form-group">
+                From: <input disabled class="form-control" value="{{ request.user.email }}">
+            </div>
+            <div class="form-group">
+                To: <input id="reply-recipients" placeholder="Recipient" disabled class="form-control">
+            </div>
+            <div class="form-group">
+                <input disabled class="form-control" id="reply-subject" placeholder="Subject">
+            </div>
+            <textarea class="form-control" id="reply-body" placeholder="Body"></textarea>
             <input type="submit" class="btn btn-primary"/>
         </form>
     </div>
